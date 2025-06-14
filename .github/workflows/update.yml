@@ -1,0 +1,27 @@
+
+name: Actualizar datos diarios
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # todos los días a las 6 AM UTC
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Activar entorno virtual
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+      - name: Ejecutar extracción diaria
+        run: |
+          jupyter nbconvert --to script "notebooks/Extraccion diaria actualizada.ipynb"
+          python notebooks/Extraccion\ diaria\ actualizada.py
+
+
+
+

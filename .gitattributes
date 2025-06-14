@@ -1,1 +1,2 @@
+*.pkl filter=lfs diff=lfs merge=lfs -text
 data/temperaturas_limpias_10_años.pkl filter=lfs diff=lfs merge=lfs -text

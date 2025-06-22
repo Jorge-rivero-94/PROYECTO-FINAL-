@@ -1,0 +1,94 @@
+from Extract.hacer_peticion import hacer_peticion
+from Extract.hacer_peticion import extraer_ultimos_tres_dias
+from Clean.clean_timestamp import clean_timestamps
+from Clean.standarize_provinces import standardize_provinces
+from Clean.convert_types import convert_types
+from Clean.engineer_calendar_features import engineer_calendar_features
+from Clean.filter_physical_outliers import filter_physical_outliers
+from Clean.interpolate_missing import interpolate_missing
+from Clean.add_info import add_info
+from Clean.knn_impute import knn_impute
+from Clean.order import order
+import logging
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('etl_pipeline.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def extract_data():
+    """Extract data using provided functions."""
+    try:
+        logger.info("Starting extraction process")
+        df = hacer_peticion()
+        df = extraer_ultimos_tres_dias()
+        logger.info(f"Extracted {len(df)} rows")
+        return df.copy()
+    except Exception as e:
+        logger.error(f"Error during extraction: {e}")
+        raise
+
+def transform_data(df):
+    """Transform the extracted data through multiple steps."""
+    try:
+        logger.info("Starting transformation process")
+        df = clean_timestamps(df)
+        logger.info("Timestamps cleaned")
+        
+        df = standardize_provinces(df)
+        logger.info("Provinces standardized")
+        
+        df = convert_types(df)
+        logger.info("Data types converted")
+        
+        df = engineer_calendar_features(df)
+        logger.info("Calendar features engineered")
+        
+        df = filter_physical_outliers(df)
+        logger.info("Physical outliers filtered")
+        
+        df = interpolate_missing(df)
+        logger.info("Missing values interpolated")
+        
+        df = add_info(df)
+        logger.info("Additional info added")
+        
+        df = knn_impute(df)
+        logger.info("KNN imputation completed")
+        
+        df = order(df)
+        logger.info("Data ordered")
+        
+        return df
+    except Exception as e:
+        logger.error(f"Error during transformation: {e}")
+        raise
+
+#función poblar aqui
+
+def run_etl():
+    """Run the complete ETL pipeline."""
+    try:
+        # Extract
+        df = extract_data()
+        
+        # Transform
+        df_transformed = transform_data(df)
+        
+        # Load
+        poblar(df_transformed)
+        
+        logger.info("ETL pipeline completed successfully")
+        return df_transformed
+    except Exception as e:
+        logger.error(f"Error in ETL pipeline: {e}")
+        raise
+
+if __name__ == "__main__":
+    run_etl()

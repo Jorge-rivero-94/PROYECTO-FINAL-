@@ -12,7 +12,7 @@ def clean_timestamps(df):
 
     """
     
-    # Validate 'fecha' 'time_stamp_extraccion' 'indicativo'
+    # Validate 'fecha' 'timestamp_extraccion' 'indicativo'
     columns_to_check = ['fecha', 'time_stamp_extraccion', 'indicativo']
     
     if df[columns_to_check].isna().any().any():

@@ -47,6 +47,6 @@ def knn_impute(df, numeric_cols=None):
         
         df.loc[active_mask & remaining_missing, numeric_cols] = imputed_numeric[remaining_missing[active_mask].to_numpy()]
     
-    columns_to_drop = ["month", "day_of_year", 'sin_day', 'cos_day', "start_date", "end_date", "latitud_dd", "longitud_dd"]
+    columns_to_drop = ["month", "day_of_year", 'sin_day', 'cos_day', "start_date", "end_date", "latitud_dd", "longitud_dd", "cluster"]
     df = df.drop(columns=[col for col in columns_to_drop if col in df.columns])
     return df

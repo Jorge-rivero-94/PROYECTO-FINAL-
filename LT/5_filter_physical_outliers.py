@@ -38,6 +38,10 @@ def filter_physical_outliers(df):
         df.loc[temp_invalida, ["tmin", "tmax", "tmed"]] = pd.NA
 
     if 'prec' in df.columns:
-        df['prec'] = df['prec'].round(2).clip(lower=0)
+        df['prec'] = df['prec'].round(2)
         logging.info("Redondear 'prec' a 2 decimales places y clip de valores negativos")
+    
+    if 'velmedia' in df.columns:
+        df['velmedia'] = df['velmedia'].round(2)
+        logging.info("Redondear 'velmedia' a 2 decimales places y clip de valores negativos")
     return df

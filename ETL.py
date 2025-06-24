@@ -1,3 +1,4 @@
+import os
 from Extract.hacer_peticion import hacer_peticion
 from Extract.hacer_peticion import extraer_ultimos_tres_dias
 from Clean.clean_timestamp import clean_timestamps
@@ -11,6 +12,7 @@ from Clean.knn_impute import knn_impute
 from Clean.order import order
 #from poblar import poblar
 import logging
+import pandas as pd
 
 # Set up logging
 logging.basicConfig(
@@ -27,9 +29,11 @@ def extract_data():
     """Extract data using provided functions."""
     try:
         logger.info("Starting extraction process")
-        df = hacer_peticion()
         df = extraer_ultimos_tres_dias()
-        logger.info(f"Extracted {len(df)} rows")
+        extract_path = r"C:\Users\User\OneDrive - Universidade de Santiago de Compostela\Documentos\Data Science\Data Science & IA Bootcamp 2024\PFB\Sprint_II\notebooks\Final\extract.pkl"
+        os.makedirs("data", exist_ok=True)
+        df.to_pickle(extract_path)
+        logger.info(f"Extracted data saved to {extract_path} ")
         return df.copy()
     except Exception as e:
         logger.error(f"Error during extraction: {e}")
@@ -42,10 +46,10 @@ def transform_data(df):
         df = clean_timestamps(df)
         logger.info("Timestamps cleaned")
         
-        df = standardize_provinces(df)
+        df = standardize_provinces(df, mapping_path="data/mapa_provincia.json")
         logger.info("Provinces standardized")
         
-        df = convert_types(df)
+        df = convert_types(df, numeric_cols=None)
         logger.info("Data types converted")
         
         df = engineer_calendar_features(df)
@@ -54,13 +58,13 @@ def transform_data(df):
         df = filter_physical_outliers(df)
         logger.info("Physical outliers filtered")
         
-        df = interpolate_missing(df)
+        df = interpolate_missing(df, numeric_cols=None)
         logger.info("Missing values interpolated")
         
-        df = add_info(df)
+        df = add_info(df, estaciones_path="data/estaciones.csv")
         logger.info("Additional info added")
         
-        df = knn_impute(df)
+        df = knn_impute(df, numeric_cols=None)
         logger.info("KNN imputation completed")
         
         df = order(df)
@@ -73,17 +77,22 @@ def transform_data(df):
 
 #función poblar aqui
 
-def run_etl():
-    """Run the complete ETL pipeline."""
+def run_etl(save_path=r"C:\Users\User\OneDrive - Universidade de Santiago de Compostela\Documentos\Data Science\Data Science & IA Bootcamp 2024\PFB\Sprint_II\notebooks\Final\output.pkl"):
+    """Run the complete ETL pipeline and save to pickle."""
     try:
         # Extract
         df = extract_data()
+
         
         # Transform
         df_transformed = transform_data(df)
         
         # Load
-        poblar(df_transformed)
+        #poblar(df_transformed)
+
+        # Save to pickle
+        df_transformed.to_pickle(save_path)
+        logger.info(f"DataFrame saved to {save_path}")
         
         logger.info("ETL pipeline completed successfully")
         return df_transformed

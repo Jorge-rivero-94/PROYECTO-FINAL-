@@ -17,7 +17,7 @@ def order(df):
     orden_columnas = [
         "id_descarga", "fecha", "indicativo", "nombre", "provincia",
         "altitud", "tmed", "tmin", "tmax", "prec", "velmedia",
-        "hrMedia", "timestamp_extraccion"]
+        "racha", "hrMedia", "timestamp_extraccion"]
 
     missing_cols = [col for col in orden_columnas if col not in df.columns]
     if missing_cols:

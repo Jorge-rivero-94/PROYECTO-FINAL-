@@ -18,9 +18,9 @@ def knn_impute(df, numeric_cols=None):
         ValueError: Si faltan las columnas requeridas.
     """
     if numeric_cols is None:
-        numeric_cols = ["tmin", "tmax", "tmed", "prec", "velmedia", "hrMedia"]
+        numeric_cols = ["tmin", "tmax", "tmed", "prec", "velmedia", "racha", "hrMedia"]
     
-    features = ['tmin', 'tmax', 'tmed', "prec", "velmedia", "hrMedia",
+    features = ['tmin', 'tmax', 'tmed', "prec", "velmedia", "racha", "hrMedia",
                 'latitud_dd', 'longitud_dd', 'altitud',
                 'month', 'day_of_year', 'sin_day', 'cos_day', 'cluster']
     required_cols = features + ['indicativo', 'fecha', 'start_date', 'end_date']

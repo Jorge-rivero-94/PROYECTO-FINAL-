@@ -12,6 +12,8 @@ def interpolate_missing(df, numeric_cols=None):
     Returns:
         pd.DataFrame: DataFrame con valores interpolados.
     """
+    if numeric_cols is None:
+        numeric_cols = ["tmin", "tmax", "tmed", "prec", "velmedia", "racha", "hrMedia"]
 
     def interpolate_group(grp, cols):
         grp = grp.sort_values('fecha').copy()

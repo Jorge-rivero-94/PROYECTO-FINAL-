@@ -14,11 +14,11 @@ def convert_types(df, numeric_cols=None):
     """
     expected_columns = [
         "id_descarga", "indicativo", "nombre", "provincia", "altitud", "fecha",
-        "tmin", "tmax", "tmed", "prec", "velmedia", "hrMedia",
+        "tmin", "tmax", "tmed", "prec", "velmedia", "racha", "hrMedia",
         "timestamp_extraccion"
     ]
     if numeric_cols is None:
-        numeric_cols = ["tmin", "tmax", "tmed", "prec", "velmedia", "hrMedia", "altitud"]
+        numeric_cols = ["tmin", "tmax", "tmed", "prec", "velmedia", "racha", "hrMedia", "altitud"]
     
     missing_cols = [col for col in numeric_cols if col not in df.columns]
     if missing_cols:

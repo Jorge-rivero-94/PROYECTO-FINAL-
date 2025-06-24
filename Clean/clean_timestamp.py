@@ -3,7 +3,7 @@ import pandas as pd
 
 def clean_timestamps(df):
     """
-    Limpiar filas sin 'fecha', 'time_stamp_extraccion','indicativo' en datos AEMET.
+    Limpiar filas sin 'fecha', 'timestamp_extraccion','indicativo' en datos AEMET.
 
     Args:
         df (pd.DataFrame): Input DataFrame de AEMET conteniendo 'fecha' y 'time_stamp_extraccion'.
@@ -14,7 +14,7 @@ def clean_timestamps(df):
     """
     
     # Validate 'fecha' 'timestamp_extraccion' 'indicativo'
-    columns_to_check = ['fecha', 'time_stamp_extraccion', 'indicativo']
+    columns_to_check = ['fecha', 'timestamp_extraccion', 'indicativo']
     
     if df[columns_to_check].isna().any().any():
         nan_counts = df[columns_to_check].isna().sum()

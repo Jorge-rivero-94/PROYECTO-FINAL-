@@ -27,6 +27,8 @@ def filter_physical_outliers(df):
             df.loc[(df["prec"] > 300) | (df["prec"] < 0), "prec"] = pd.NA
         elif col == "velmedia":
             df.loc[(df["velmedia"] > 25) | (df["velmedia"] < 0), "velmedia"] = pd.NA
+        elif col == "racha":
+            df.loc[(df["racha"] > 50) | (df["racha"] < 0), "racha"] = pd.NA
         elif col == "hrMedia":
             df.loc[(df["hrMedia"] < 5) | (df["hrMedia"] > 100), "hrMedia"] = pd.NA
         after = df[col].isna().sum()

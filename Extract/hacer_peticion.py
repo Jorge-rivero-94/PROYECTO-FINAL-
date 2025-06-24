@@ -4,6 +4,8 @@ import uuid
 import requests
 import pandas as pd
 from datetime import date, timedelta, datetime
+import logging
+logger = logging.getLogger(__name__)
 
 API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZXJpdmVyb2RlbG9zcmlvc0BnbWFpbC5jb20iLCJqdGkiOiJiMjlhZmM2Zi0yMTkwLTQ4ZTEtYjlmYy01NGY5OTk3OTc1YjUiLCJpc3MiOiJBRU1FVCIsImlhdCI6MTc0ODk2ODY4NSwidXNlcklkIjoiYjI5YWZjNmYtMjE5MC00OGUxLWI5ZmMtNTRmOTk5Nzk3NWI1Iiwicm9sZSI6IiJ9.90idEjGLaI61xKuPe8sdQtBJ2fdf4gwZmsww11V1VpE"
 if not API_KEY:
@@ -14,7 +16,7 @@ def hacer_peticion(url, params=None, timeout=30, reintentos=5):
     Hago una petición GET con reintentos y espera progresiva.
     Ignoro timeouts
     """
-    espera = 2
+    espera = 10
     for intento in range(1, reintentos + 1):
         try:
             print(f"[{intento}/{reintentos}] solicitando {url}")
@@ -44,17 +46,36 @@ def extraer_ultimos_tres_dias():
         "https://opendata.aemet.es/opendata/api/"
         "valores/climatologicos/inventarioestaciones/todasestaciones"
     )
-    respuesta = hacer_peticion(url_inventario, params={"api_key": API_KEY})
-    if respuesta:
-        datos_url = respuesta.json().get("datos", "")
-        inventario = hacer_peticion(datos_url)
-        if inventario:
-            estaciones = inventario.json()
-            os.makedirs("data", exist_ok=True)
-            with open(ruta_cache, "w") as f:
-                f.write(inventario.text)
-        else:
-            raise RuntimeError("No pude descargar el inventario de la AEMET.")
+    estaciones = None
+    if os.path.exists(ruta_cache):
+        logger.info("Inventario en caché encontrado, intentando usar caché")
+        try:
+            estaciones = pd.read_json(ruta_cache).to_dict(orient="records")
+            logger.info("Inventario cargado desde caché")
+        except Exception as e:
+            logger.error(f"Error al leer caché: {e}, intentando API")
+    
+    if not estaciones:
+        respuesta = hacer_peticion(url_inventario, params={"api_key": API_KEY})
+        if not respuesta:
+            raise RuntimeError ("Sin respuesta del inventario de estaciones y no hay caché")
+        try:
+            response_json = respuesta.json()
+            datos_url = response_json.get("datos", "")
+            if not datos_url or not datos_url.startswith("http"):
+                raise RuntimeError(f"URL de datos inválida: {datos_url}")
+            inventario = hacer_peticion(datos_url)
+            if inventario:
+                estaciones = inventario.json()
+                os.makedirs("data", exist_ok=True)
+                with open(ruta_cache, "w") as f:
+                    f.write(inventario.text)
+                logger.info("Inventario descargado y guardado")
+            else:
+                raise RuntimeError("No pude descargar el inventario de la AEMET.")
+        except ValueError as e:
+            logger.error({f"Error al parsear la respuesta JSON: {e}"})
+            raise RuntimeError("Error en la respuesta JSON y no hay caché invalida")
     else:
         if os.path.exists(ruta_cache):
             print("Uso el inventario guardado en caché")
@@ -105,7 +126,7 @@ def extraer_ultimos_tres_dias():
                 })
                 todas_las_filas.append(registro)
 
-            time.sleep(1)
+            time.sleep(2)
         
 
     # Guardo el CSV final
@@ -114,6 +135,6 @@ def extraer_ultimos_tres_dias():
         return df_salida
     else:
         print("No obtuve datos en los últimos 3 días.")
-
+        return pd.DataFrame
 if __name__ == "__main__":
     extraer_ultimos_tres_dias()

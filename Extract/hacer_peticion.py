@@ -7,7 +7,9 @@ from datetime import date, timedelta, datetime
 import logging
 logger = logging.getLogger(__name__)
 
-API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZXJpdmVyb2RlbG9zcmlvc0BnbWFpbC5jb20iLCJqdGkiOiJiMjlhZmM2Zi0yMTkwLTQ4ZTEtYjlmYy01NGY5OTk3OTc1YjUiLCJpc3MiOiJBRU1FVCIsImlhdCI6MTc0ODk2ODY4NSwidXNlcklkIjoiYjI5YWZjNmYtMjE5MC00OGUxLWI5ZmMtNTRmOTk5Nzk3NWI1Iiwicm9sZSI6IiJ9.90idEjGLaI61xKuPe8sdQtBJ2fdf4gwZmsww11V1VpE"
+#API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJqb3JnZXJpdmVyb2RlbG9zcmlvc0BnbWFpbC5jb20iLCJqdGkiOiJiMjlhZmM2Zi0yMTkwLTQ4ZTEtYjlmYy01NGY5OTk3OTc1YjUiLCJpc3MiOiJBRU1FVCIsImlhdCI6MTc0ODk2ODY4NSwidXNlcklkIjoiYjI5YWZjNmYtMjE5MC00OGUxLWI5ZmMtNTRmOTk5Nzk3NWI1Iiwicm9sZSI6IiJ9.90idEjGLaI61xKuPe8sdQtBJ2fdf4gwZmsww11V1VpE"
+API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhdWd1c3RvOTM5MjFAZ21haWwuY29tIiwianRpIjoiZDYxZjgwMzctNWI0MC00MmM4LTg0MDYtNWZiMjc4YmY4OTZjIiwiaXNzIjoiQUVNRVQiLCJpYXQiOjE3NDk3MjI0MTMsInVzZXJJZCI6ImQ2MWY4MDM3LTViNDAtNDJjOC04NDA2LTVmYjI3OGJmODk2YyIsInJvbGUiOiIifQ.bMbSgQTIz_Tyqlx4c_ps60ZfnFs4iF7H9x6aV9xlF4Q"
+
 if not API_KEY:
     raise RuntimeError("No encontré la clave AEMET_API_KEY en las variables de entorno.")
 
@@ -16,7 +18,7 @@ def hacer_peticion(url, params=None, timeout=30, reintentos=5):
     Hago una petición GET con reintentos y espera progresiva.
     Ignoro timeouts
     """
-    espera = 10
+    espera = 15
     for intento in range(1, reintentos + 1):
         try:
             print(f"[{intento}/{reintentos}] solicitando {url}")
@@ -89,10 +91,10 @@ def extraer_ultimos_tres_dias():
     # Defino bloques de fecha para los últimos 3 días
     hoy = date.today()
     bloques = []
-    for i in range(1, 4):
+    for i in range(1, 14):
         dia = hoy - timedelta(days=i)
         iso = dia.isoformat()
-        bloques.append((f"{iso}T00:00:00UTC", f"{iso}T00:00:00UTC"))
+        bloques.append((f"{iso}T00:00:00UTC", f"{iso}T23:59:59UTC"))
 
     # Recorro cada estación y extraigo datos
     todas_las_filas = []
@@ -126,7 +128,7 @@ def extraer_ultimos_tres_dias():
                 })
                 todas_las_filas.append(registro)
 
-            time.sleep(2)
+            time.sleep(5)
         
 
     # Guardo el CSV final

@@ -1,5 +1,4 @@
 import os
-from Extract.hacer_peticion import hacer_peticion
 from Extract.hacer_peticion import extraer_ultimos_tres_dias
 from Clean.clean_timestamp import clean_timestamps
 from Clean.standarize_provinces import standardize_provinces
@@ -30,10 +29,11 @@ def extract_data():
     try:
         logger.info("Starting extraction process")
         df = extraer_ultimos_tres_dias()
-        extract_path = r"C:\Users\User\OneDrive - Universidade de Santiago de Compostela\Documentos\Data Science\Data Science & IA Bootcamp 2024\PFB\Sprint_II\notebooks\Final\extract.pkl"
+        extract_path = "data/extract.pkl"
         os.makedirs("data", exist_ok=True)
         df.to_pickle(extract_path)
         logger.info(f"Extracted data saved to {extract_path} ")
+        logger.info(f"Extracted {len(df)} rows")
         return df.copy()
     except Exception as e:
         logger.error(f"Error during extraction: {e}")
@@ -61,7 +61,7 @@ def transform_data(df):
         df = interpolate_missing(df, numeric_cols=None)
         logger.info("Missing values interpolated")
         
-        df = add_info(df, estaciones_path="data/estaciones.csv")
+        df = add_info(df, estaciones_path="data/estaciones_nombre_indicativo.csv")
         logger.info("Additional info added")
         
         df = knn_impute(df, numeric_cols=None)
@@ -81,9 +81,10 @@ def run_etl(save_path=r"C:\Users\User\OneDrive - Universidade de Santiago de Com
     """Run the complete ETL pipeline and save to pickle."""
     try:
         # Extract
-        df = extract_data()
+        #df = extract_data()
 
-        
+        df = pd.read_pickle("data/extract.pkl")
+   
         # Transform
         df_transformed = transform_data(df)
         
